@@ -23,7 +23,7 @@ export interface DbAccount {
 	 */
 	otpSecret: string | null;
 	/**
-	 * The recovery codes of the user (separated by a comma)
+	 * The recovery codes of the user (separated by a comma) (each code is a 16 alphanumeric string, 10 codes)
 	 */
 	recoveryCodes: string;
 }
