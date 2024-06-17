@@ -11,11 +11,11 @@ export interface DbUser {
 	ID: number;
 	
 	/**
-	 * The username of the user
+	 * The username of the user (null if the user is deleted, because of the unique constraint on the username column, and the legal requirements for storing user data)
 	 */
-	username: string;
+	username: string | null;
 	/**
-	 * The email of the user
+	 * The email of the user (null if the user is deleted, because of the unique constraint on the email column, and the legal requirements for storing user data)
 	 */
 	email: string;
 	
