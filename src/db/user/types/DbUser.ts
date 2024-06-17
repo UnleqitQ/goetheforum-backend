@@ -28,10 +28,6 @@ export interface DbUser {
 	 * The date the user was created
 	 */
 	createdAt: Date;
-	/**
-	 * The date the user was last online
-	 */
-	lastOnline: Date;
 	
 	/**
 	 * The date the user was deleted (if not null, the user is deleted, the account is removed, but the user is still stored in the database)
