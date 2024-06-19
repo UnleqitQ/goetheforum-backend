@@ -14,11 +14,11 @@ class AccountDatabase {
 			pool.query(`
 				CREATE TABLE IF NOT EXISTS accounts
 				(
-					ID            SERIAL       NOT NULL,
-					userId        INT          NOT NULL,
-					password      TINYBLOB     NOT NULL,
+					ID            SERIAL          NOT NULL,
+					userId        BIGINT UNSIGNED NOT NULL,
+					password      TINYBLOB        NOT NULL,
 					otpSecret     VARCHAR(255),
-					recoveryCodes VARCHAR(196) NOT NULL,
+					recoveryCodes VARCHAR(196)    NOT NULL,
 					
 					PRIMARY KEY ( ID ) USING BTREE,
 					FOREIGN KEY ( userId ) REFERENCES users ( ID ) ON DELETE CASCADE
