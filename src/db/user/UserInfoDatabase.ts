@@ -47,7 +47,7 @@ class UserInfoDatabase {
 			pool.query(`
 				SELECT *
 				FROM user_info
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err, res) => {
 				if (err) {
 					reject(err);
@@ -67,7 +67,7 @@ class UserInfoDatabase {
 			pool.query(`
 				SELECT *
 				FROM user_info
-				WHERE userId = $1
+				WHERE userId = ?
 			`, [userId], (err, res) => {
 				if (err) {
 					reject(err);
@@ -86,7 +86,7 @@ class UserInfoDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				INSERT INTO user_info (userId)
-				VALUES ($1)
+				VALUES (?)
 			`, [userId], (err, res) => {
 				if (err) {
 					reject(err);
@@ -113,7 +113,7 @@ class UserInfoDatabase {
 			pool.query(`
 				UPDATE user_info
 				SET ${set}
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID, ...values], (err) => {
 				if (err) {
 					reject(err);
@@ -133,7 +133,7 @@ class UserInfoDatabase {
 			pool.query(`
 				DELETE
 				FROM user_info
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);

@@ -1,5 +1,5 @@
-import pool from "./db";
-import {DbAccount} from "./types/DbAccount";
+import pool from './db';
+import {DbAccount} from './types/DbAccount';
 
 /**
  * Class to interact with the account table in the database
@@ -43,7 +43,7 @@ class AccountDatabase {
 			pool.query(`
 				SELECT *
 				FROM accounts
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err, res) => {
 				if (err) {
 					reject(err);
@@ -63,7 +63,7 @@ class AccountDatabase {
 			pool.query(`
 				SELECT *
 				FROM accounts
-				WHERE userId = $1
+				WHERE userId = ?
 			`, [userId], (err, res) => {
 				if (err) {
 					reject(err);
@@ -87,7 +87,7 @@ class AccountDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				INSERT INTO accounts (userId, password, otpSecret, recoveryCodes)
-				VALUES ($1, $2, $3, $4)
+				VALUES (?, ?, ?, ?)
 			`, [userId, password, otpSecret, recoveryCodes], (err, res) => {
 				if (err) {
 					reject(err);
@@ -108,9 +108,9 @@ class AccountDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				UPDATE accounts
-				SET password = $2
-				WHERE ID = $1
-			`, [ID, password], (err) => {
+				SET password = ?
+				WHERE ID = ?
+			`, [password, ID], (err) => {
 				if (err) {
 					reject(err);
 				}
@@ -130,9 +130,9 @@ class AccountDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				UPDATE accounts
-				SET otpSecret = $2
-				WHERE ID = $1
-			`, [ID, otpSecret], (err) => {
+				SET otpSecret = ?
+				WHERE ID = ?
+			`, [otpSecret, ID], (err) => {
 				if (err) {
 					reject(err);
 				}
@@ -152,9 +152,9 @@ class AccountDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				UPDATE accounts
-				SET recoveryCodes = $2
-				WHERE ID = $1
-			`, [ID, recoveryCodes], (err) => {
+				SET recoveryCodes = ?
+				WHERE ID = ?
+			`, [recoveryCodes, ID], (err) => {
 				if (err) {
 					reject(err);
 				}
@@ -172,8 +172,9 @@ class AccountDatabase {
 	static deleteAccount(ID: number): Promise<void> {
 		return new Promise((resolve, reject) => {
 			pool.query(`
-				DELETE FROM accounts
-				WHERE ID = $1
+				DELETE
+				FROM accounts
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);

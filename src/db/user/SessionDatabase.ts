@@ -65,7 +65,7 @@ class SessionDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				INSERT INTO sessions (userId, token, expires, lastUsed)
-				VALUES ($1, $2, NOW() + ${SessionDatabase.SQL_SESSION_EXPIRATION}, NOW())
+				VALUES (?, ?, NOW() + ${SessionDatabase.SQL_SESSION_EXPIRATION}, NOW())
 			`, [userId, token], (err, res) => {
 				if (err) {
 					reject(err);
@@ -86,7 +86,7 @@ class SessionDatabase {
 			pool.query(`
 				SELECT *
 				FROM sessions
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err, res) => {
 				if (err) {
 					reject(err);
@@ -108,7 +108,7 @@ class SessionDatabase {
 			pool.query(`
 				SELECT *
 				FROM sessions
-				WHERE userId = $1 AND token = $2
+				WHERE userId = ? AND token = ?
 			`, [userId, token], (err, res) => {
 				if (err) {
 					reject(err);
@@ -128,7 +128,7 @@ class SessionDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				DELETE FROM sessions
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);
@@ -148,7 +148,7 @@ class SessionDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				DELETE FROM sessions
-				WHERE userId = $1
+				WHERE userId = ?
 			`, [userId], (err) => {
 				if (err) {
 					reject(err);
@@ -169,7 +169,7 @@ class SessionDatabase {
 			pool.query(`
 				UPDATE sessions
 				SET lastUsed = NOW()
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);

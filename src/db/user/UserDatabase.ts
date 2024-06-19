@@ -47,7 +47,7 @@ class UserDatabase {
 			pool.query(`
 				SELECT *
 				FROM users
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err, res) => {
 				if (err) {
 					reject(err);
@@ -67,7 +67,7 @@ class UserDatabase {
 			pool.query(`
 				SELECT *
 				FROM users
-				WHERE username = $1
+				WHERE username = ?
 			`, [username], (err, res) => {
 				if (err) {
 					reject(err);
@@ -87,7 +87,7 @@ class UserDatabase {
 			pool.query(`
 				SELECT *
 				FROM users
-				WHERE email = $1
+				WHERE email = ?
 			`, [email], (err, res) => {
 				if (err) {
 					reject(err);
@@ -127,7 +127,7 @@ class UserDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				INSERT INTO users (username, email, displayName, role)
-				VALUES ($1, $2, $3, $4)
+				VALUES (?, ?, ?, ?)
 			`, [user.username, user.email, user.displayName, user.role], (err, res) => {
 				if (err) {
 					reject(err);
@@ -148,8 +148,8 @@ class UserDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				UPDATE users
-				SET displayName = $1
-				WHERE ID = $2
+				SET displayName = ?
+				WHERE ID = ?
 			`, [displayName, ID], (err) => {
 				if (err) {
 					reject(err);
@@ -172,7 +172,7 @@ class UserDatabase {
 				SET deletedAt = CURRENT_TIMESTAMP,
 				    username = NULL, /* F*** legal requirements */
 				    email = NULL /* F*** legal requirements, again */
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);
@@ -193,7 +193,7 @@ class UserDatabase {
 			pool.query(`
 				UPDATE users
 				SET bannedAt = CURRENT_TIMESTAMP
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);
@@ -214,7 +214,7 @@ class UserDatabase {
 			pool.query(`
 				UPDATE users
 				SET bannedAt = NULL
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);
@@ -235,8 +235,8 @@ class UserDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				UPDATE users
-				SET role = $1
-				WHERE ID = $2
+				SET role = ?
+				WHERE ID = ?
 			`, [role, ID], (err) => {
 				if (err) {
 					reject(err);
@@ -258,7 +258,7 @@ class UserDatabase {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				DELETE FROM users
-				WHERE ID = $1
+				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
 					reject(err);
