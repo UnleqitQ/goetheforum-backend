@@ -17,7 +17,7 @@ export interface DbUserInfo {
 	/**
 	 * The user's profile picture
 	 */
-	profilePicture: string | null;
+	profilePicture: Buffer | null;
 	/**
 	 * The user's bio
 	 */
