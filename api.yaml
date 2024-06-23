@@ -86,11 +86,10 @@ paths:
       tags:
         - Account
       summary: Log in to an account.
-      description: "
-      When mfa is enabled, the user must complete multiple steps to log in.
-      After the first step, the user receives a token that must be used in the next step.
-      The token contains the previous verification steps, as some verification methods are considered equivalent to others (e.g. backup codes and totp).
-      "
+      description: >
+        When mfa is enabled, the user must complete multiple steps to log in.
+        After the first step, the user receives a token that must be used in the next step.
+        The token contains the previous verification steps, as some verification methods are considered equivalent to others (e.g. backup codes and totp).
       requestBody:
         required: true
         content:

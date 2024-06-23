@@ -206,7 +206,7 @@
     "@types/range-parser" "*"
     "@types/send" "*"
 
-"@types/express@^4.17.21":
+"@types/express@*", "@types/express@^4.17.21":
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.21.tgz#c26d4a151e60efe0084b23dc3369ebc631ed192d"
   integrity sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==
@@ -280,6 +280,14 @@
     "@types/http-errors" "*"
     "@types/node" "*"
     "@types/send" "*"
+
+"@types/swagger-ui-express@^4.1.6":
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/@types/swagger-ui-express/-/swagger-ui-express-4.1.6.tgz#d0929e3fabac1a96a8a9c6c7ee8d42362c5cdf48"
+  integrity sha512-UVSiGYXa5IzdJJG3hrc86e8KdZWLYxyEsVoUI4iPXc7CO4VZ3AfNP8d/8+hrDRIqz+HAaSMtZSqAsF3Nq2X/Dg==
+  dependencies:
+    "@types/express" "*"
+    "@types/serve-static" "*"
 
 accepts@~1.3.8:
   version "1.3.8"
@@ -1651,6 +1659,18 @@ supports-color@^7.1.0:
   dependencies:
     has-flag "^4.0.0"
 
+swagger-ui-dist@>=5.0.0:
+  version "5.17.14"
+  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-5.17.14.tgz#e2c222e5bf9e15ccf80ec4bc08b4aaac09792fd6"
+  integrity sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw==
+
+swagger-ui-express@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/swagger-ui-express/-/swagger-ui-express-5.0.1.tgz#fb8c1b781d2793a6bd2f8a205a3f4bd6fa020dd8"
+  integrity sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==
+  dependencies:
+    swagger-ui-dist ">=5.0.0"
+
 text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
@@ -1794,6 +1814,11 @@ y18n@^4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.3.tgz#b5f259c82cd6e336921efd7bfd8bf560de9eeedf"
   integrity sha512-JKhqTOwSrqNA1NY5lSztJ1GrBiUodLMmIZuLiDaMRJ+itFd+ABVE8XBjOvIWL+rSqNDC74LCSFmlb/U4UZ4hJQ==
+
+yaml@^2.4.5:
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.4.5.tgz#60630b206dd6d84df97003d33fc1ddf6296cca5e"
+  integrity sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==
 
 yargs-parser@^18.1.2:
   version "18.1.3"
