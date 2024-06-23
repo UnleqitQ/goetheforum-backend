@@ -31,6 +31,10 @@ paths:
                 password:
                   type: string
                   minLength: 8
+              required:
+                - username
+                - email
+                - password
       responses:
         '200':
           description: OK
@@ -98,6 +102,8 @@ paths:
                   properties:
                     verification_type:
                       $ref: '#/components/schemas/VerificationType'
+                  required:
+                    - verification_type
                 - oneOf:
                     # Username
                     - type: object
