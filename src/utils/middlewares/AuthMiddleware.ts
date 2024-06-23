@@ -1,11 +1,10 @@
 import {Request, Response, NextFunction} from 'express';
 import core from 'express-serve-static-core';
-import jwt, {JwtBasicPayload} from '../jwt/JwtUtils';
 import {ErrorResponse} from '../../types/ErrorResponse';
+import Session from '../user/Session';
 
 
 export interface AuthRequest<
-	JwtPayload extends Record<string, any> = JwtBasicPayload,
 	P = core.ParamsDictionary,
 	ResBody = any,
 	ReqBody = any,
@@ -15,42 +14,33 @@ export interface AuthRequest<
 	user?: {
 		id: number;
 		token: string;
-		payload: JwtPayload;
+		session_token: string;
+		session_id: number;
 	};
-}
-
-interface AuthOptions {
-	/**
-	 * Whether the user must be authenticated.
-	 * 'necessary' means the user must be authenticated.
-	 * 'valid' means if the user is authenticated, the user must have a valid token, otherwise the user can be unauthenticated.
-	 * 'unnecessary' means the user can be authenticated or unauthenticated, if the toke is invalid, the user will be treated as unauthenticated.
-	 */
-	rule: 'necessary' | 'valid' | 'unnecessary';
-	/**
-	 * What token type is required.
-	 */
-	type: 'access' | 'refresh' | 'login';
 }
 
 /**
  * Middleware to check if the user is authenticated.
- * @param options Options for the middleware.
+ * @param type The token type required.
+ * @param rule The rule to follow.
+ * 'necessary' means the user must be authenticated and have a valid token.
+ * 'valid' means if the user is authenticated, the user must have a valid token, otherwise the user can be unauthenticated.
+ * 'unnecessary' means the user can be authenticated or unauthenticated, if the toke is invalid, the user will be treated as unauthenticated.
+ * @return The middleware.
  */
 export const auth = (
-	options: Partial<AuthOptions> = {rule: 'valid', type: 'access'},
+	type: 'access' | 'refresh' = 'access',
+	rule: 'necessary' | 'valid' | 'unnecessary' = 'necessary',
 ): ((
 	req: AuthRequest,
 	res: Response<ErrorResponse>,
 	next: NextFunction,
 ) => void) => {
-	const rule = options.rule || 'valid';
-	const type = options.type || 'access';
-	if (!(rule in ['necessary', 'valid', 'unnecessary'])) {
-		throw new Error('Invalid rule');
+	if (type !== 'access' && type !== 'refresh') {
+		throw new Error('Invalid token type');
 	}
-	if (!(type in ['access', 'refresh', 'login'])) {
-		throw new Error('Invalid type');
+	if (rule !== 'necessary' && rule !== 'valid' && rule !== 'unnecessary') {
+		throw new Error('Invalid rule');
 	}
 	
 	return async (req: AuthRequest<any, any, ErrorResponse>, res: Response<ErrorResponse>, next: NextFunction) => {
@@ -75,7 +65,7 @@ export const auth = (
 				next();
 				return;
 			}
-			res.status(401).json({
+			res.status(400).json({
 				message: 'Invalid token',
 				type: 'invalid_token',
 				longMessage: 'The token is invalid or not provided correctly (Bearer token)',
@@ -83,26 +73,28 @@ export const auth = (
 			return;
 		}
 		
-		try {
-			const payload = jwt.verify(token, type);
-			req.user = {
-				id: payload.user_id,
-				token,
-				payload,
-			};
-			next();
-		}
-		catch (e) {
+		const session = type === 'access' ? await Session.byAccessToken(
+			token) : await Session.byRefreshToken(token);
+		if (!session) {
 			if (rule === 'unnecessary') {
 				req.user = undefined;
 				next();
 				return;
 			}
-			res.status(401).json({
+			res.status(400).json({
 				message: 'Invalid token',
 				type: 'invalid_token',
 				longMessage: 'The token is invalid',
 			});
+			return;
 		}
+		
+		req.user = {
+			id: session.userId,
+			token,
+			session_token: session.accessToken,
+			session_id: session.ID,
+		};
+		next();
 	};
 };

@@ -39,10 +39,10 @@ class JwtUtils {
 		});
 	}
 	
-	static verify(token: string, type: 'access' | 'refresh' | 'login'): JwtBasicPayload {
+	static verify<T extends JwtBasicPayload = JwtBasicPayload>(token: string, type: 'access' | 'refresh' | 'login'): T {
 		return jwt.verify(token, SETTINGS[type].secret, {
 			issuer: SETTINGS[type].issuer,
-		}) as JwtBasicPayload;
+		}) as T;
 	}
 }
 
