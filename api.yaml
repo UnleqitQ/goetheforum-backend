@@ -10,6 +10,7 @@ servers:
     description: Local server
 
 paths:
+  # Register
   /account/register:
     post:
       summary: Register a new account.
@@ -77,6 +78,315 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  # Login
+  /account/login:
+    post:
+      summary: Log in to an account.
+      description: "
+      When mfa is enabled, the user must complete multiple steps to log in.
+      After the first step, the user receives a token that must be used in the next step.
+      The token contains the previous verification steps, as some verification methods are considered equivalent to others (e.g. backup codes and totp).
+      "
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    verification_type:
+                      $ref: '#/components/schemas/VerificationType'
+                - oneOf:
+                    # Username
+                    - type: object
+                      title: Username with password
+                      properties:
+                        username:
+                          type: string
+                          example: user123
+                        verification_type:
+                          type: string
+                          enum: [ password ]
+                          example: password
+                        password:
+                          type: string
+                          example: secret_password
+                      required:
+                        - username
+                        - verification_type
+                        - password
+                    - type: object
+                      title: Username with TOTP
+                      properties:
+                        username:
+                          type: string
+                          example: user123
+                        verification_type:
+                          type: string
+                          enum: [ totp ]
+                          example: totp
+                        totp:
+                          type: string
+                          pattern: '^[0-9]{6}$'
+                          example: 123456
+                      required:
+                        - username
+                        - verification_type
+                        - totp
+                    - type: object
+                      title: Username with backup code
+                      properties:
+                        username:
+                          type: string
+                          example: user123
+                        verification_type:
+                          type: string
+                          enum: [ backup_code ]
+                          example: backup_code
+                        backup_code:
+                          type: string
+                          pattern: '^[a-zA-Z0-9]{16}$'
+                          example: abcdef1234567890
+                      required:
+                        - username
+                        - verification_type
+                        - backup_code
+                    - type: object
+                      title: Username with email code
+                      properties:
+                        username:
+                          type: string
+                          example: user123
+                        verification_type:
+                          type: string
+                          enum: [ email ]
+                          example: email
+                        email_code:
+                          type: string
+                          pattern: '^[a-zA-Z0-9]{6}$'
+                          example: 123456
+                      required:
+                        - username
+                        - verification_type
+                        - email_code
+                    # Email
+                    - type: object
+                      title: Email with password
+                      properties:
+                        email:
+                          type: string
+                          format: email
+                          example: user@example.com
+                        verification_type:
+                          type: string
+                          enum: [ password ]
+                          example: password
+                        password:
+                          type: string
+                          example: secret_password
+                      required:
+                        - email
+                        - verification_type
+                        - password
+                    - type: object
+                      title: Email with TOTP
+                      properties:
+                        email:
+                          type: string
+                          format: email
+                          example: user@example.com
+                        verification_type:
+                          type: string
+                          enum: [ totp ]
+                          example: totp
+                        totp:
+                          type: string
+                          pattern: '^[0-9]{6}$'
+                          example: 123456
+                      required:
+                        - email
+                        - verification_type
+                        - totp
+                    - type: object
+                      title: Email with backup code
+                      properties:
+                        email:
+                          type: string
+                          format: email
+                          example: user@example.com
+                        verification_type:
+                          type: string
+                          enum: [ backup_code ]
+                          example: backup_code
+                        backup_code:
+                          type: string
+                          pattern: '^[a-zA-Z0-9]{16}$'
+                          example: abcdef1234567890
+                      required:
+                        - email
+                        - verification_type
+                        - backup_code
+                    - type: object
+                      title: Email with email code
+                      properties:
+                        email:
+                          type: string
+                          format: email
+                          example: user@example.com
+                        verification_type:
+                          type: string
+                          enum: [ email ]
+                          example: email
+                        email_code:
+                          type: string
+                          pattern: '^[a-zA-Z0-9]{6}$'
+                          example: 123456
+                      required:
+                        - email
+                        - verification_type
+                        - email_code
+                    # Token
+                    - type: object
+                      title: Login token with password
+                      description: The login token is used for an intermediate login step (e.g. when the user has 2FA enabled).
+                      properties:
+                        token:
+                          type: string
+                          format: jwt
+                        verification_type:
+                          type: string
+                          enum: [ password ]
+                          example: password
+                        password:
+                          type: string
+                          example: secret_password
+                      required:
+                        - token
+                        - verification_type
+                        - password
+                    - type: object
+                      title: Login token with TOTP
+                      description: The login token is used for an intermediate login step (e.g. when the user has 2FA enabled).
+                      properties:
+                        token:
+                          type: string
+                          format: jwt
+                        verification_type:
+                          type: string
+                          enum: [ totp ]
+                          example: totp
+                        totp:
+                          type: string
+                          pattern: '^[0-9]{6}$'
+                          example: 123456
+                      required:
+                        - token
+                        - verification_type
+                        - totp
+                    - type: object
+                      title: Login token with backup code
+                      description: The login token is used for an intermediate login step (e.g. when the user has 2FA enabled).
+                      properties:
+                        token:
+                          type: string
+                          format: jwt
+                        verification_type:
+                          type: string
+                          enum: [ backup_code ]
+                          example: backup_code
+                        backup_code:
+                          type: string
+                          pattern: '^[a-zA-Z0-9]{16}$'
+                          example: abcdef1234567890
+                      required:
+                        - token
+                        - verification_type
+                        - backup_code
+                    - type: object
+                      title: Login token with email code
+                      description: The login token is used for an intermediate login step (e.g. when the user has 2FA enabled).
+                      properties:
+                        token:
+                          type: string
+                          format: jwt
+                        verification_type:
+                          type: string
+                          enum: [ email ]
+                          example: email
+                        email_code:
+                          type: string
+                          pattern: '^[a-zA-Z0-9]{6}$'
+                          example: 123456
+                      required:
+                        - token
+                        - verification_type
+                        - email_code
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: [ intermediary, complete ]
+                    required:
+                      - status
+                  - type: object
+                    oneOf:
+                      - type: object
+                        title: Intermediary
+                        properties:
+                          status:
+                            type: string
+                            enum: [ intermediary ]
+                            example: intermediary
+                          previous:
+                            type: array
+                            description: The verification types that have been used so far.
+                            uniqueItems: true
+                            items:
+                              $ref: '#/components/schemas/VerificationType'
+                          next:
+                            type: array
+                            description: The verification types that can be used next.
+                            uniqueItems: true
+                            items:
+                              $ref: '#/components/schemas/VerificationType'
+                          token:
+                            type: string
+                            format: jwt
+                        required:
+                          - status
+                          - token
+                          - next
+                          - previous
+                      - type: object
+                        title: Complete
+                        properties:
+                          status:
+                            type: string
+                            enum: [ complete ]
+                            example: complete
+                          user:
+                            $ref: '#/components/schemas/User'
+                          access_token:
+                            type: string
+                            format: jwt
+                          refresh_token:
+                            type: string
+                            format: jwt
+                        required:
+                          - status
+                          - user
+                          - refresh_token
+                          - access_token
 
 
 components:
@@ -153,6 +463,9 @@ components:
     Role:
       type: string
       enum: [ UNVERIFIED, USER, MODERATOR, ADMIN, OWNER, SYSTEM ]
+    VerificationType:
+      type: string
+      enum: [ password, totp, backup_code, email ]
   securitySchemes:
     bearerAuth:
       type: http

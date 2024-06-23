@@ -71,6 +71,16 @@ class Account {
 		this._recoveryCodes = codes;
 	}
 	
+	public async useRecoveryCode(code: string, remove: boolean = false): Promise<boolean> {
+		const index = this._recoveryCodes.indexOf(code);
+		if (index === -1) return false;
+		if (remove) {
+			this._recoveryCodes.splice(index, 1);
+			await this.setRecoveryCodes(this._recoveryCodes);
+		}
+		return true;
+	}
+	
 	public async setPassword(password: Buffer | string): Promise<void> {
 		const pw = typeof password === 'string' ? Account.hashPassword(password) : password;
 		await AccountDatabase.updatePassword(this._ID, pw);

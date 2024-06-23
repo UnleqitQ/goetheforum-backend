@@ -146,7 +146,7 @@ class User {
 		return new User(user);
 	}
 	
-	public static async getUserByEmail(email: string): Promise<User | null> {
+	public static async byEmail(email: string): Promise<User | null> {
 		const user = await UserDatabase.getUserByEmail(email);
 		if (!user) return null;
 		return new User(user);
