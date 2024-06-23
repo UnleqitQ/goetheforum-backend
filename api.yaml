@@ -393,7 +393,35 @@ paths:
                           - user
                           - refresh_token
                           - access_token
-
+  # Refresh token
+  /account/refresh:
+    post:
+      security:
+        - RefreshToken: [ ]
+      summary: Refresh the access token using the refresh token.
+      responses:
+        '200':
+          description: OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    format: jwt
+                  user_id:
+                    type: integer
+                    format: int64
+                required:
+                  - access_token
+                  - user_id
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   schemas:
@@ -473,7 +501,44 @@ components:
       type: string
       enum: [ password, totp, backup_code, email ]
   securitySchemes:
-    bearerAuth:
+    AccessToken:
+      description: JWT access token.
       type: http
       scheme: bearer
       bearerFormat: JWT
+    RefreshToken:
+      description: JWT refresh token.
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

@@ -19,33 +19,23 @@ export interface AuthRequest<
 	};
 }
 
-interface AuthOptions {
-	/**
-	 * Whether the user must be authenticated.
-	 * 'necessary' means the user must be authenticated.
-	 * 'valid' means if the user is authenticated, the user must have a valid token, otherwise the user can be unauthenticated.
-	 * 'unnecessary' means the user can be authenticated or unauthenticated, if the toke is invalid, the user will be treated as unauthenticated.
-	 */
-	rule: 'necessary' | 'valid' | 'unnecessary';
-	/**
-	 * What token type is required.
-	 */
-	type: 'access' | 'refresh';
-}
-
 /**
  * Middleware to check if the user is authenticated.
- * @param options Options for the middleware.
+ * @param type The token type required.
+ * @param rule The rule to follow.
+ * 'necessary' means the user must be authenticated and have a valid token.
+ * 'valid' means if the user is authenticated, the user must have a valid token, otherwise the user can be unauthenticated.
+ * 'unnecessary' means the user can be authenticated or unauthenticated, if the toke is invalid, the user will be treated as unauthenticated.
+ * @return The middleware.
  */
 export const auth = (
-	options: Partial<AuthOptions> = {rule: 'valid', type: 'access'},
+	type: 'access' | 'refresh' = 'access',
+	rule: 'necessary' | 'valid' | 'unnecessary' = 'necessary',
 ): ((
 	req: AuthRequest,
 	res: Response<ErrorResponse>,
 	next: NextFunction,
 ) => void) => {
-	const rule = options.rule || 'valid';
-	const type = options.type || 'access';
 	if (!(rule in ['necessary', 'valid', 'unnecessary'])) {
 		throw new Error('Invalid rule');
 	}
