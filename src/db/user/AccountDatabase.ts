@@ -49,7 +49,7 @@ class AccountDatabase {
 					reject(err);
 				}
 				else {
-					resolve(res.rows[0] || null);
+					resolve(res[0] || null);
 				}
 			});
 		});
@@ -69,7 +69,7 @@ class AccountDatabase {
 					reject(err);
 				}
 				else {
-					resolve(res.rows[0] || null);
+					resolve(res[0] || null);
 				}
 			});
 		});
