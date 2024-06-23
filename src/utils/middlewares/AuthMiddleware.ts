@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import core from 'express-serve-static-core';
 import jwt, {JwtBasicPayload} from '../jwt/JwtUtils';
+import {ErrorResponse} from '../../types/ErrorResponse';
 
 
 export interface AuthRequest<
@@ -40,7 +41,7 @@ export const auth = (
 	options: Partial<AuthOptions> = {rule: 'valid', type: 'access'},
 ): ((
 	req: AuthRequest,
-	res: Response,
+	res: Response<ErrorResponse>,
 	next: NextFunction,
 ) => void) => {
 	const rule = options.rule || 'valid';
@@ -52,11 +53,15 @@ export const auth = (
 		throw new Error('Invalid type');
 	}
 	
-	return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+	return async (req: AuthRequest<any, any, ErrorResponse>, res: Response<ErrorResponse>, next: NextFunction) => {
 		const auth = req.headers.authorization;
 		if (!auth) {
 			if (rule === 'necessary') {
-				res.status(401).send('Unauthorized');
+				res.status(401).json({
+					message: 'Unauthorized',
+					type: 'unauthorized',
+					longMessage: 'No token provided',
+				});
 				return;
 			}
 			req.user = undefined;
@@ -64,13 +69,17 @@ export const auth = (
 			return;
 		}
 		const [tokenType, token] = auth.split(' ');
-		if (tokenType !== 'Bearer') {
+		if (tokenType !== 'Bearer' || !token) {
 			if (rule === 'unnecessary') {
 				req.user = undefined;
 				next();
 				return;
 			}
-			res.status(401).send('Unauthorized');
+			res.status(401).json({
+				message: 'Invalid token',
+				type: 'invalid_token',
+				longMessage: 'The token is invalid or not provided correctly (Bearer token)',
+			});
 			return;
 		}
 		
@@ -82,13 +91,18 @@ export const auth = (
 				payload,
 			};
 			next();
-		} catch (e) {
+		}
+		catch (e) {
 			if (rule === 'unnecessary') {
 				req.user = undefined;
 				next();
 				return;
 			}
-			res.status(401).send('Unauthorized');
+			res.status(401).json({
+				message: 'Invalid token',
+				type: 'invalid_token',
+				longMessage: 'The token is invalid',
+			});
 		}
 	};
 };
