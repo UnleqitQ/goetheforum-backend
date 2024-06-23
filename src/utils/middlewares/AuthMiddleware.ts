@@ -36,11 +36,11 @@ export const auth = (
 	res: Response<ErrorResponse>,
 	next: NextFunction,
 ) => void) => {
-	if (!(rule in ['necessary', 'valid', 'unnecessary'])) {
-		throw new Error('Invalid rule');
+	if (type !== 'access' && type !== 'refresh') {
+		throw new Error('Invalid token type');
 	}
-	if (!(type in ['access', 'refresh'])) {
-		throw new Error('Invalid type');
+	if (rule !== 'necessary' && rule !== 'valid' && rule !== 'unnecessary') {
+		throw new Error('Invalid rule');
 	}
 	
 	return async (req: AuthRequest<any, any, ErrorResponse>, res: Response<ErrorResponse>, next: NextFunction) => {
