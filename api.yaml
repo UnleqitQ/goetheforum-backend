@@ -434,6 +434,52 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  # Change password
+  /account/change-password:
+    post:
+      tags:
+        - Account
+      security:
+        - AccessToken: [ ]
+      summary: Change the password of the currently logged in user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                  minLength: 8
+                  example: secret_password123
+                new_password:
+                  type: string
+                  minLength: 8
+                  example: secret_password456
+              required:
+                - old_password
+                - new_password
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                required:
+                  - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  #
 
 components:
   schemas:
@@ -514,12 +560,12 @@ components:
       enum: [ password, totp, backup_code, email ]
   securitySchemes:
     AccessToken:
-      description: JWT access token.
+      description: JWT access token. By default, the token is valid for 2 hours.
       type: http
       scheme: bearer
       bearerFormat: JWT
     RefreshToken:
-      description: JWT refresh token.
+      description: JWT refresh token. By default, the token is valid for 4 weeks.
       type: http
       scheme: bearer
       bearerFormat: JWT
