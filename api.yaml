@@ -1,0 +1,160 @@
+openapi: 3.0.1
+
+info:
+  title: GoetheForum API
+  description: API for the GoetheForum application.
+  version: 1.0.0
+
+servers:
+  - url: 'https://localhost:3000'
+    description: Local server
+
+paths:
+  /account/register:
+    post:
+      summary: Register a new account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 5
+                  maxLength: 250
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  user_id:
+                    type: integer
+                    format: int64
+                  account_id:
+                    type: integer
+                    format: int64
+                  access_token:
+                    type: string
+                    format: jwt
+                  refresh_token:
+                    type: string
+                    format: jwt
+                  user:
+                    $ref: '#/components/schemas/User'
+                required:
+                  - email
+                  - access_token
+                  - account_id
+                  - refresh_token
+                  - user
+                  - user_id
+                  - username
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      description: An error response object. (None of the properties are guaranteed to be present.)
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+        longMessage:
+          type: string
+        details:
+          type: object
+    User:
+      type: object
+      description: A user object. (Username and email may be null if the user is deleted (soft delete, for privacy reasons).)
+      properties:
+        ID:
+          type: integer
+          format: int64
+        username:
+          type: string
+          description: Username may be null if the user is deleted.
+        email:
+          type: string
+          format: email
+          description: Email may be null if the user is deleted.
+        role:
+          $ref: '#/components/schemas/Role'
+        displayName:
+          type: string
+        createdAt:
+          type: object
+          format: date-time
+        deletedAt:
+          type: object
+          format: date-time
+        bannedAt:
+          type: object
+          format: date-time
+      required:
+        - ID
+        - role
+        - displayName
+        - createdAt
+    Session:
+      type: object
+      description: A session object. (The token is not included in this object.)
+      properties:
+        ID:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        created:
+          type: object
+          format: date-time
+        expires:
+          type: object
+          format: date-time
+        lastUsed:
+          type: object
+          format: date-time
+      required:
+        - ID
+        - userId
+        - created
+        - expires
+        - lastUsed
+    Role:
+      type: string
+      enum: [ UNVERIFIED, USER, MODERATOR, ADMIN, OWNER, SYSTEM ]
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
