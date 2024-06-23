@@ -7,8 +7,8 @@ import {body, validationResult} from 'express-validator';
 const router = Router();
 
 interface RqBody {
-	oldPassword: string;
-	newPassword: string;
+	old_password: string;
+	new_password: string;
 }
 
 interface RsBody {
@@ -16,11 +16,11 @@ interface RsBody {
 }
 
 const validate = [
-	body('oldPassword').isString(),
-	body('newPassword').isString().isLength({min: 8}),
+	body('old_password').isString(),
+	body('new_password').isString().isLength({min: 8}),
 ];
 
-router.post('/change_password', validate, auth(),
+router.post('/', validate, auth(),
 	async (req: AuthRequest<{}, RsBody | ErrorResponse, RqBody>, res: Response<RsBody | ErrorResponse>) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -38,7 +38,7 @@ router.post('/change_password', validate, auth(),
 			});
 		}
 		
-		const {oldPassword, newPassword} = req.body;
+		const {old_password, new_password} = req.body;
 		const account = await Account.byUserId(req.user!.id);
 		if (!account) {
 			return res.status(404).json({
@@ -47,7 +47,7 @@ router.post('/change_password', validate, auth(),
 			});
 		}
 		
-		if (!account.verifyPassword(oldPassword)) {
+		if (!account.verifyPassword(old_password)) {
 			return res.status(400).json({
 				type: 'invalid_password',
 				message: 'Invalid password',
@@ -55,7 +55,7 @@ router.post('/change_password', validate, auth(),
 			});
 		}
 		
-		await account.setPassword(newPassword);
+		await account.setPassword(new_password);
 		
 		return res.json({
 			success: true,
