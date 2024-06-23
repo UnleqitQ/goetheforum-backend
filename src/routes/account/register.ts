@@ -80,7 +80,7 @@ router.post('/', validate,
 		{
 			const taken = await User.isUsernameTaken(username);
 			if (taken) {
-				return res.status(400).json({
+				return res.status(409).json({
 					type: 'already_used',
 					message: 'Username is already taken',
 				});
@@ -90,7 +90,7 @@ router.post('/', validate,
 		{
 			const taken = await User.isEmailTaken(email);
 			if (taken) {
-				return res.status(400).json({
+				return res.status(409).json({
 					type: 'already_used',
 					message: 'Email is already taken',
 				});
