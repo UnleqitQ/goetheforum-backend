@@ -10,6 +10,13 @@ const swaggerDocument = yaml.parse(file);
 
 const router = Router();
 
-router.use('/swagger-ui', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.use('/swagger-ui', swaggerUi.serve, swaggerUi.setup(
+	swaggerDocument,
+	{
+		swaggerOptions: {
+			persistAuthorization: true,
+		}
+	},
+));
 
 export default router;
