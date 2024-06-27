@@ -14,6 +14,8 @@ tags:
     description: Account related operations (Children&colon; Account Settings)
   - name: Account Settings
     description: Account settings related operations
+  - name: User
+    description: User related operations
 
 paths:
   # Register
@@ -480,7 +482,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  # TOTP
   # Generate TOTP secret
   /account/settings/totp/add/generate:
     post:
@@ -516,6 +517,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     # Verify TOTP secret
+  # Verify the TOTP secret
   /account/settings/totp/add/verify:
     post:
       tags:
@@ -713,7 +715,39 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  #
+  # Get user info
+  /user/{user_id}/info:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get the user information of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   schemas:
@@ -761,6 +795,39 @@ components:
         - role
         - displayName
         - createdAt
+    UserInfo:
+      type: object
+      description: A user info object.
+      properties:
+        user_id:
+          type: integer
+          format: int64
+        profilePicture:
+          # The profile picture is sent as a buffer object.
+          type: string
+          format: binary
+        bio:
+          type: string
+        website:
+          type: string
+          format: url
+        location:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        phoneNumber:
+          type: string
+          format: phone
+        preferredLanguage:
+          type: string
+          example: en
+        languages:
+          type: array
+          items:
+            type: string
+            example: en
+          example: [ en, de ]
     Session:
       type: object
       description: A session object. (The token is not included in this object.)
