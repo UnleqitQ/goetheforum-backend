@@ -38,7 +38,7 @@ export interface UserInfoData {
 	preferredLanguage: string | null;
 	
 	/**
-	 * The languages the user speaks (two-letter language codes separated by a comma)
+	 * The languages the user speaks (two-letter language codes)
 	 */
-	languages: string;
+	languages: string[];
 }

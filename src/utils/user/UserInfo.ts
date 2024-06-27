@@ -77,7 +77,7 @@ class UserInfo {
 			dateOfBirth: this.dateOfBirth,
 			phoneNumber: this.phoneNumber,
 			preferredLanguage: this.preferredLanguage,
-			languages: this.languages,
+			languages: this.languages.split(','),
 		};
 	}
 	
@@ -133,7 +133,7 @@ class UserInfo {
 		return new UserInfo(userInfo);
 	}
 	
-	public static async byUserId(userId: number, createIfNotExists: boolean = false): Promise<UserInfo | null> {
+	public static async byUserId(userId: number, createIfNotExists: boolean = true): Promise<UserInfo | null> {
 		const userInfo = await UserInfoDatabase.getUserInfoByUserId(userId);
 		if (userInfo === null) {
 			if (!createIfNotExists) {
