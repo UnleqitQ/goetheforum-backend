@@ -7,11 +7,11 @@ export interface UserInfoData {
 	/**
 	 * The user's profile picture
 	 */
-	profilePicture: Buffer | null;
+	profilePicture: string | null;
 	/**
 	 * The user's bio
 	 */
-	bio: string;
+	bio: string | null;
 	
 	/**
 	 * The user's website
@@ -40,5 +40,5 @@ export interface UserInfoData {
 	/**
 	 * The languages the user speaks (two-letter language codes)
 	 */
-	languages: string[];
+	languages: string[] | null;
 }

@@ -21,7 +21,7 @@ export interface DbUserInfo {
 	/**
 	 * The user's bio
 	 */
-	bio: string;
+	bio: string | null;
 	
 	/**
 	 * The user's website
@@ -50,5 +50,5 @@ export interface DbUserInfo {
 	/**
 	 * The languages the user speaks (two-letter language codes separated by a comma)
 	 */
-	languages: string;
+	languages: string | null;
 }

@@ -23,7 +23,7 @@ paths:
     post:
       tags:
         - Account
-      summary: Register a new account.
+      description: Register a new account.
       requestBody:
         required: true
         content:
@@ -89,8 +89,9 @@ paths:
     post:
       tags:
         - Account
-      summary: Log in to an account.
+      summary: Log in
       description: >
+        Log in to an account.
         When mfa is enabled, the user must complete multiple steps to log in.
         After the first step, the user receives a token that must be used in the next step.
         The token contains the previous verification steps, as some verification methods are considered equivalent to others (e.g. backup codes and totp).
@@ -413,7 +414,8 @@ paths:
         - Account
       security:
         - RefreshToken: [ ]
-      summary: Refresh the access token using the refresh token.
+      summary: Refresh token
+      description: Refresh the access token using the refresh token.
       responses:
         '200':
           description: OK'
@@ -444,7 +446,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Change the password of the currently logged in user.
+      summary: Change password
+      description: Change the password of the currently logged in user.
       requestBody:
         required: true
         content:
@@ -489,7 +492,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Generate a new TOTP secret for the currently logged in user and store it temporarily (expires after 5 minutes)
+      summary: Generate TOTP secret
+      description: Generate a new TOTP secret for the currently logged in user and store it temporarily (expires after 5 minutes)
       responses:
         '200':
           description: OK
@@ -516,7 +520,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    # Verify TOTP secret
   # Verify the TOTP secret
   /account/settings/totp/add/verify:
     post:
@@ -524,7 +527,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Verify the TOTP secret for the currently logged in user.
+      summary: Verify TOTP secret
+      description: Verify the TOTP secret for the currently logged in user.
       requestBody:
         required: true
         content:
@@ -570,7 +574,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Cancel the TOTP setup for the currently logged in user.
+      summary: Cancel TOTP setup
+      description: Cancel the TOTP setup for the currently logged in user.
       responses:
         '200':
           description: OK
@@ -599,7 +604,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Remove the TOTP secret for the currently logged in user.
+      summary: Remove TOTP
+      description: Remove the TOTP secret for the currently logged in user.
       requestBody:
         required: true
         content:
@@ -645,7 +651,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Get the TOTP status for the currently logged in user.
+      summary: Get TOTP status
+      description: Get the TOTP status for the currently logged in user.
       responses:
         '200':
           description: OK
@@ -674,7 +681,8 @@ paths:
         - Account
       security:
         - AccessToken: [ ]
-      summary: Get the account information of the currently logged in user.
+      summary: Get account info
+      description: Get the account information of the currently logged in user.
       responses:
         '200':
           description: OK
@@ -705,7 +713,8 @@ paths:
         - Account
       security:
         - AccessToken: [ ]
-      summary: Log out the currently logged in user.
+      summary: Logout
+      description: Log out the currently logged in user.
       responses:
         '200':
           description: OK
@@ -715,14 +724,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  # Get user info
+  # User Info
   /user/{user_id}/info:
     get:
       tags:
         - User
       security:
         - AccessToken: [ ]
-      summary: Get the user information of a user.
+      summary: Get user info
+      description: Get the user information of a user.
       parameters:
         - name: user_id
           in: path
@@ -748,6 +758,81 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user info
+      description: Update the user information of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              # The user info without userId
+              type: object
+              properties:
+                profilePicture:
+                  type: string
+                  format: base64
+                  nullable: true
+                bio:
+                  type: string
+                  nullable: true
+                website:
+                  type: string
+                  format: url
+                  nullable: true
+                location:
+                  type: string
+                  nullable: true
+                dateOfBirth:
+                  type: string
+                  format: date
+                  nullable: true
+                phoneNumber:
+                  type: string
+                  format: phone
+                  nullable: true
+                  example: +49 123 456789
+                preferredLanguage:
+                  type: string
+                  example: en
+                  nullable: true
+                languages:
+                  type: array
+                  items:
+                    type: string
+                    example: en
+                  example: [ en, de ]
+                  nullable: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  #
 
 components:
   schemas:
@@ -799,35 +884,46 @@ components:
       type: object
       description: A user info object.
       properties:
-        user_id:
+        userId:
           type: integer
           format: int64
         profilePicture:
           # The profile picture is sent as a buffer object.
           type: string
-          format: binary
+          format: base64
+          nullable: true
         bio:
           type: string
+          nullable: true
         website:
           type: string
           format: url
+          nullable: true
         location:
           type: string
+          nullable: true
         dateOfBirth:
           type: string
           format: date
+          nullable: true
         phoneNumber:
           type: string
           format: phone
+          nullable: true
+          example: +49 123 456789
         preferredLanguage:
           type: string
           example: en
+          nullable: true
         languages:
           type: array
           items:
             type: string
             example: en
           example: [ en, de ]
+          nullable: true
+      required:
+        - userId
     Session:
       type: object
       description: A session object. (The token is not included in this object.)

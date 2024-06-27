@@ -17,13 +17,13 @@ class UserInfoDatabase {
 					ID                SERIAL          NOT NULL,
 					userId            BIGINT UNSIGNED NOT NULL,
 					profilePicture    BLOB,
-					bio               TEXT            NOT NULL DEFAULT '',
+					bio               TEXT,
 					website           VARCHAR(255),
 					location          VARCHAR(255),
 					dateOfBirth       DATE,
 					phoneNumber       VARCHAR(15),
 					preferredLanguage VARCHAR(2),
-					languages         VARCHAR(255)    NOT NULL DEFAULT '',
+					languages         VARCHAR(255),
 					
 					PRIMARY KEY ( ID ) USING BTREE,
 					FOREIGN KEY ( userId ) REFERENCES users ( ID ) ON DELETE CASCADE
