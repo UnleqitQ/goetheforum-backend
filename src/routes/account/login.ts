@@ -321,7 +321,7 @@ router.post('/', validate,
 			return;
 		}
 		else if (verificationType == 'backup_code') {
-			if (!account.useRecoveryCode(req.body.backup_code)) {
+			if (!await account.useRecoveryCode(req.body.backup_code)) {
 				res.status(401).json({
 					type: 'invalid_backup_code',
 					message: 'Invalid backup code',
