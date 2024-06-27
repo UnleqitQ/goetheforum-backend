@@ -9,6 +9,7 @@ import {VerificationType, VerificationTypeRules} from '../../types/VerificationT
 import JwtUtils from '../../utils/jwt/JwtUtils';
 import {JwtLoginPayload} from '../../utils/jwt/JwtLogin';
 import {Role} from '../../types/Role';
+import TotpUtils from '../../utils/totp/TotpUtils';
 
 /*
 The login may consist of multiple steps depending on the authentication method and the settings of the user.
@@ -314,11 +315,21 @@ router.post('/', validate,
 			}
 		}
 		else if (verificationType == 'totp') {
-			res.status(400).json({
-				type: 'invalid_request',
-				message: 'TOTP verification is not yet supported',
-			});
-			return;
+			const secret = account.otpSecret;
+			if (!secret) {
+				res.status(400).json({
+					type: 'totp_not_enabled',
+					message: 'TOTP is not enabled',
+				});
+				return;
+			}
+			if (!TotpUtils.verifyToken(TotpUtils.generateTotp(secret), req.body.totp)) {
+				res.status(401).json({
+					type: 'invalid_totp',
+					message: 'Invalid TOTP token',
+				});
+				return;
+			}
 		}
 		else if (verificationType == 'backup_code') {
 			if (!await account.useRecoveryCode(req.body.backup_code)) {
