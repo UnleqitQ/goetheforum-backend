@@ -1,6 +1,7 @@
 {
   "verbose": true,
   "watch": [
-	"api.yaml"
+	"api.yaml",
+	"./src"
   ]
 }
