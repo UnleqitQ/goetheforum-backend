@@ -480,6 +480,191 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  # TOTP
+  # Generate TOTP secret
+  /account/settings/totp/add/generate:
+    post:
+      tags:
+        - Account Settings
+      security:
+        - AccessToken: [ ]
+      summary: Generate a new TOTP secret for the currently logged in user and store it temporarily (expires after 5 minutes)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+                    example: JBSWY3DPEHPK3PXP
+                  qr:
+                    type: string
+                    format: uri
+                    example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAgAElEQVR4nOzdeXxU1f7H8e9
+                required:
+                  - secret
+                  - qr
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    # Verify TOTP secret
+  /account/settings/totp/add/verify:
+    post:
+      tags:
+        - Account Settings
+      security:
+        - AccessToken: [ ]
+      summary: Verify the TOTP secret for the currently logged in user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  pattern: '^[0-9]{6}$'
+                  example: 123456
+                password:
+                  type: string
+                  example: secret_password
+              required:
+                - token
+                - password
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                required:
+                  - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # Cancel TOTP setup
+  /account/settings/totp/add/cancel:
+    post:
+      tags:
+        - Account Settings
+      security:
+        - AccessToken: [ ]
+      summary: Cancel the TOTP setup for the currently logged in user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                required:
+                  - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # Remove TOTP
+  /account/settings/totp/remove:
+    post:
+      tags:
+        - Account Settings
+      security:
+        - AccessToken: [ ]
+      summary: Remove the TOTP secret for the currently logged in user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                validation_type:
+                  type: string
+                  enum: [ totp, backup_code ]
+                  example: totp
+                token:
+                  type: string
+                  example: 123456
+              required:
+                - validation_type
+                - token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                required:
+                  - success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # Get TOTP status
+  /account/settings/totp/status:
+    get:
+      tags:
+        - Account Settings
+      security:
+        - AccessToken: [ ]
+      summary: Get the TOTP status for the currently logged in user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                    example: true
+                required:
+                  - enabled
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   #
 
 components:
@@ -561,12 +746,12 @@ components:
       enum: [ password, totp, backup_code, email ]
   securitySchemes:
     AccessToken:
-      description: JWT access token. By default, the token is valid for 2 hours.
+      description: JWT access token. By default, the token is valid for 2 hours. (Can return statuses&colon; 400, 401)
       type: http
       scheme: bearer
       bearerFormat: JWT
     RefreshToken:
-      description: JWT refresh token. By default, the token is valid for 4 weeks.
+      description: JWT refresh token. By default, the token is valid for 4 weeks. (Can return statuses&colon; 400, 401)
       type: http
       scheme: bearer
       bearerFormat: JWT
