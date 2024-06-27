@@ -731,13 +731,13 @@ components:
         displayName:
           type: string
         createdAt:
-          type: object
+          type: string
           format: date-time
         deletedAt:
-          type: object
+          type: string
           format: date-time
         bannedAt:
-          type: object
+          type: string
           format: date-time
       required:
         - ID
@@ -755,13 +755,13 @@ components:
           type: integer
           format: int64
         created:
-          type: object
+          type: string
           format: date-time
         expires:
-          type: object
+          type: string
           format: date-time
         lastUsed:
-          type: object
+          type: string
           format: date-time
       required:
         - ID
