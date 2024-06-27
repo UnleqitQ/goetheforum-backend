@@ -1,7 +1,7 @@
 import {Response, Router} from 'express';
-import {auth, AuthRequest} from '../../utils/middlewares/AuthMiddleware';
-import {ErrorResponse} from '../../types/ErrorResponse';
-import Account from '../../utils/user/Account';
+import {auth, AuthRequest} from '../../../utils/middlewares/AuthMiddleware';
+import {ErrorResponse} from '../../../types/ErrorResponse';
+import Account from '../../../utils/user/Account';
 import {body, validationResult} from 'express-validator';
 
 const router = Router();

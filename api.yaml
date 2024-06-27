@@ -11,7 +11,9 @@ servers:
 
 tags:
   - name: Account
-    description: Account related operations (register, login, refresh token, change password, etc.)
+    description: Account related operations (Children&colon; Account Settings)
+  - name: Account Settings
+    description: Account settings related operations
 
 paths:
   # Register
@@ -434,10 +436,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
   # Change password
-  /account/change_password:
+  /account/settings/change_password:
     post:
       tags:
-        - Account
+        - Account Settings
       security:
         - AccessToken: [ ]
       summary: Change the password of the currently logged in user.
