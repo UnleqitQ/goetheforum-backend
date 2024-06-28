@@ -8,6 +8,8 @@ import {Role, RoleLevel} from '../../../types/Role';
 import {validationResult, param, matchedData, body} from 'express-validator';
 import ImageUtils from '../../../utils/image/ImageUtils';
 
+import userInfoRoutes from './userInfoRoutes';
+
 // Param for all routes: ':user_id'
 const router = Router({mergeParams: true});
 
@@ -211,6 +213,105 @@ const PROFILE_PICTURE_SETTINGS = {
 			
 			res.json(userInfo.data);
 		});
+}
+
+// Sub-routes
+{
+	router.use('/profile_picture', userInfoRoutes<string>(
+		body('value').optional({values: 'null'}).isString().isBase64(),
+		userInfo => userInfo.profilePictureBase64,
+		(userInfo, value) => userInfo.setProfilePicture(value),
+		(value, res) => {
+			if (value === null) {
+				return true;
+			}
+			const result = ImageUtils.checkImage(value, PROFILE_PICTURE_SETTINGS);
+			if (result !== true) {
+				switch (result) {
+					case 'fileSize':
+						res.status(400).json({
+							type: 'invalid_request',
+							message: 'Invalid request',
+							longMessage: 'Profile picture is too large (max 5 MiB)',
+						});
+						return false;
+					case 'dimensions':
+						res.status(400).json({
+							type: 'invalid_request',
+							message: 'Invalid request',
+							longMessage: 'Invalid dimensions (Accepts only 10x10 to 4000x4000)',
+						});
+						return false;
+					case 'format':
+						res.status(400).json({
+							type: 'invalid_request',
+							message: 'Invalid request',
+							longMessage: 'Invalid format (Accepts only PNG)',
+						});
+						return false;
+					case 'invalid':
+						res.status(400).json({
+							type: 'invalid_request',
+							message: 'Invalid request',
+							longMessage: 'The image is invalid (corrupted or not an image)',
+						});
+						return false;
+					default:
+						res.status(500).json({
+							type: 'internal_server_error',
+							message: 'Unknown error',
+						});
+						return false;
+				}
+			}
+			return true;
+		},
+	));
+	
+	router.use('/bio', userInfoRoutes<string>(
+		body('value').optional({values: 'null'}).isString(),
+		userInfo => userInfo.bio,
+		(userInfo, value) => userInfo.setBio(value),
+	));
+	
+	router.use('/website', userInfoRoutes<string>(
+		body('value').optional({values: 'null'}).isString().isLength({max: 255}).isURL(),
+		userInfo => userInfo.website,
+		(userInfo, value) => userInfo.setWebsite(value),
+	));
+	
+	router.use('/location', userInfoRoutes<string>(
+		body('value').optional({values: 'null'}).isString().isLength({max: 255}),
+		userInfo => userInfo.location,
+		(userInfo, value) => userInfo.setLocation(value),
+	));
+	
+	router.use('/date_of_birth', userInfoRoutes<Date>(
+		body('value').optional({values: 'null'}).isDate(),
+		userInfo => userInfo.dateOfBirth,
+		(userInfo, value) => userInfo.setDateOfBirth(value),
+	));
+	
+	router.use('/phone_number', userInfoRoutes<string>(
+		body('value').optional({values: 'null'}).isString().isLength({max: 15}),
+		userInfo => userInfo.phoneNumber,
+		(userInfo, value) => userInfo.setPhoneNumber(value),
+	));
+	
+	router.use('/preferred_language', userInfoRoutes<string>(
+		body('value').optional({values: 'null'}).isString().isLength({min: 2, max: 2}),
+		userInfo => userInfo.preferredLanguage,
+		(userInfo, value) => userInfo.setPreferredLanguage(value),
+	));
+	
+	router.use('/languages', userInfoRoutes<string[]>(
+		[
+			body('value').optional({values: 'null'}).isArray(),
+			body('value.*').isString().isLength({min: 2, max: 2}),
+		],
+		userInfo => userInfo.languagesArray,
+		(userInfo, value) => userInfo.setLanguagesArray(value),
+	));
 }
 
 

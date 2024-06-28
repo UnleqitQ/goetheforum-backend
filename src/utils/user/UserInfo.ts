@@ -105,7 +105,7 @@ class UserInfo {
 		this._profilePicture = data;
 	}
 	
-	public async setBio(bio: string): Promise<void> {
+	public async setBio(bio: string | null): Promise<void> {
 		await UserInfoDatabase.updateUserInfo(this.ID, {bio});
 		this._bio = bio;
 	}
@@ -135,9 +135,15 @@ class UserInfo {
 		this._preferredLanguage = preferredLanguage;
 	}
 	
-	public async setLanguages(languages: string): Promise<void> {
+	public async setLanguages(languages: string | null): Promise<void> {
 		await UserInfoDatabase.updateUserInfo(this.ID, {languages});
 		this._languages = languages;
+	}
+	
+	public async setLanguagesArray(languages: string[] | null): Promise<void> {
+		const data: string | null = languages === null ? null : languages.join(',');
+		await UserInfoDatabase.updateUserInfo(this.ID, {languages: data});
+		this._languages = data;
 	}
 	
 	/**
