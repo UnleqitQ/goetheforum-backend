@@ -1718,6 +1718,82 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  # User display name
+  /user/{user_id}/display_name:
+    get:
+      tags:
+        - User
+      summary: Get user display name
+      description: Get the display name of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    maxLength: 255
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user display name
+      description: Update the display name of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  maxLength: 255
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   #
 
 components:
