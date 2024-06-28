@@ -14,6 +14,8 @@ tags:
     description: Account related operations (Children&colon; Account Settings)
   - name: Account Settings
     description: Account settings related operations
+  - name: User
+    description: User related operations
 
 paths:
   # Register
@@ -21,7 +23,7 @@ paths:
     post:
       tags:
         - Account
-      summary: Register a new account.
+      description: Register a new account.
       requestBody:
         required: true
         content:
@@ -87,8 +89,9 @@ paths:
     post:
       tags:
         - Account
-      summary: Log in to an account.
+      summary: Log in
       description: >
+        Log in to an account.
         When mfa is enabled, the user must complete multiple steps to log in.
         After the first step, the user receives a token that must be used in the next step.
         The token contains the previous verification steps, as some verification methods are considered equivalent to others (e.g. backup codes and totp).
@@ -411,7 +414,8 @@ paths:
         - Account
       security:
         - RefreshToken: [ ]
-      summary: Refresh the access token using the refresh token.
+      summary: Refresh token
+      description: Refresh the access token using the refresh token.
       responses:
         '200':
           description: OK'
@@ -442,7 +446,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Change the password of the currently logged in user.
+      summary: Change password
+      description: Change the password of the currently logged in user.
       requestBody:
         required: true
         content:
@@ -480,7 +485,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  # TOTP
   # Generate TOTP secret
   /account/settings/totp/add/generate:
     post:
@@ -488,7 +492,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Generate a new TOTP secret for the currently logged in user and store it temporarily (expires after 5 minutes)
+      summary: Generate TOTP secret
+      description: Generate a new TOTP secret for the currently logged in user and store it temporarily (expires after 5 minutes)
       responses:
         '200':
           description: OK
@@ -515,14 +520,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    # Verify TOTP secret
+  # Verify the TOTP secret
   /account/settings/totp/add/verify:
     post:
       tags:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Verify the TOTP secret for the currently logged in user.
+      summary: Verify TOTP secret
+      description: Verify the TOTP secret for the currently logged in user.
       requestBody:
         required: true
         content:
@@ -568,7 +574,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Cancel the TOTP setup for the currently logged in user.
+      summary: Cancel TOTP setup
+      description: Cancel the TOTP setup for the currently logged in user.
       responses:
         '200':
           description: OK
@@ -597,7 +604,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Remove the TOTP secret for the currently logged in user.
+      summary: Remove TOTP
+      description: Remove the TOTP secret for the currently logged in user.
       requestBody:
         required: true
         content:
@@ -643,7 +651,8 @@ paths:
         - Account Settings
       security:
         - AccessToken: [ ]
-      summary: Get the TOTP status for the currently logged in user.
+      summary: Get TOTP status
+      description: Get the TOTP status for the currently logged in user.
       responses:
         '200':
           description: OK
@@ -672,7 +681,8 @@ paths:
         - Account
       security:
         - AccessToken: [ ]
-      summary: Get the account information of the currently logged in user.
+      summary: Get account info
+      description: Get the account information of the currently logged in user.
       responses:
         '200':
           description: OK
@@ -703,7 +713,8 @@ paths:
         - Account
       security:
         - AccessToken: [ ]
-      summary: Log out the currently logged in user.
+      summary: Logout
+      description: Log out the currently logged in user.
       responses:
         '200':
           description: OK
@@ -711,6 +722,1000 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info
+  /user/{user_id}/info:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user info
+      description: Get the user information of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user info
+      description: Update the user information of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              # The user info without userId
+              type: object
+              properties:
+                profilePicture:
+                  type: string
+                  format: base64
+                  nullable: true
+                bio:
+                  type: string
+                  nullable: true
+                website:
+                  type: string
+                  format: url
+                  nullable: true
+                location:
+                  type: string
+                  nullable: true
+                dateOfBirth:
+                  type: string
+                  format: date
+                  nullable: true
+                phoneNumber:
+                  type: string
+                  format: phone
+                  nullable: true
+                  example: +49 123 456789
+                preferredLanguage:
+                  type: string
+                  example: en
+                  nullable: true
+                languages:
+                  type: array
+                  items:
+                    type: string
+                    example: en
+                  example: [ en, de ]
+                  nullable: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info profile picture
+  /user/{user_id}/info/profile_picture:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user profile picture
+      description: Get the profile picture of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    format: base64
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user profile picture
+      description: Update the profile picture of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  format: base64
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user profile picture
+      description: Delete the profile picture of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info bio
+  /user/{user_id}/info/bio:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user bio
+      description: Get the bio of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user bio
+      description: Update the bio of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user bio
+      description: Delete the bio of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info website
+  /user/{user_id}/info/website:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user website
+      description: Get the website of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    maxLength: 255
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user website
+      description: Update the website of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user website
+      description: Delete the website of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info location
+  /user/{user_id}/info/location:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user location
+      description: Get the location of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    maxLength: 255
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user location
+      description: Update the location of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user location
+      description: Delete the location of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info date of birth
+  /user/{user_id}/info/date_of_birth:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user date of birth
+      description: Get the date of birth of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    format: date
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user date of birth
+      description: Update the date of birth of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  format: date
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user date of birth
+      description: Delete the date of birth of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info phone number
+  /user/{user_id}/info/phone_number:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user phone number
+      description: Get the phone number of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    maxLength: 15
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user phone number
+      description: Update the phone number of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  maxLength: 15
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user phone number
+      description: Delete the phone number of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info preferred language
+  /user/{user_id}/info/preferred_language:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user preferred language
+      description: Get the preferred language of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    minLength: 2
+                    maxLength: 2
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user preferred language
+      description: Update the preferred language of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  minLength: 2
+                  maxLength: 2
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user preferred language
+      description: Delete the preferred language of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # User Info languages
+  /user/{user_id}/info/languages:
+    get:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Get user languages
+      description: Get the languages of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: string
+                      minLength: 2
+                      maxLength: 2
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user languages
+      description: Update the languages of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: array
+                  items:
+                    type: string
+                    minLength: 2
+                    maxLength: 2
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user languages
+      description: Delete the languages of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
   #
@@ -761,6 +1766,50 @@ components:
         - role
         - displayName
         - createdAt
+    UserInfo:
+      type: object
+      description: A user info object.
+      properties:
+        userId:
+          type: integer
+          format: int64
+        profilePicture:
+          # The profile picture is sent as a buffer object.
+          type: string
+          format: base64
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        website:
+          type: string
+          format: url
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+        phoneNumber:
+          type: string
+          format: phone
+          nullable: true
+          example: +49 123 456789
+        preferredLanguage:
+          type: string
+          example: en
+          nullable: true
+        languages:
+          type: array
+          items:
+            type: string
+            example: en
+          example: [ en, de ]
+          nullable: true
+      required:
+        - userId
     Session:
       type: object
       description: A session object. (The token is not included in this object.)

@@ -1,14 +1,4 @@
-/**
- * The database representation of a user's custom information
- * The account information is stored in the Account table (see DbAccount)
- * All information stored here can be changed by the user (except the ID, and the user ID)
- */
-export interface DbUserInfo {
-	/**
-	 * The ID of the user
-	 */
-	ID: number;
-	
+export interface UserInfoData {
 	/**
 	 * The id of the user (foreign key)
 	 */
@@ -17,7 +7,7 @@ export interface DbUserInfo {
 	/**
 	 * The user's profile picture
 	 */
-	profilePicture: Buffer | null;
+	profilePicture: string | null;
 	/**
 	 * The user's bio
 	 */
@@ -48,7 +38,7 @@ export interface DbUserInfo {
 	preferredLanguage: string | null;
 	
 	/**
-	 * The languages the user speaks (two-letter language codes separated by a comma)
+	 * The languages the user speaks (two-letter language codes)
 	 */
-	languages: string | null;
+	languages: string[] | null;
 }

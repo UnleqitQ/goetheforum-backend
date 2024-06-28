@@ -17,13 +17,13 @@ class UserInfoDatabase {
 					ID                SERIAL          NOT NULL,
 					userId            BIGINT UNSIGNED NOT NULL,
 					profilePicture    BLOB,
-					bio               TEXT            NOT NULL DEFAULT '',
+					bio               TEXT,
 					website           VARCHAR(255),
 					location          VARCHAR(255),
 					dateOfBirth       DATE,
 					phoneNumber       VARCHAR(15),
 					preferredLanguage VARCHAR(2),
-					languages         VARCHAR(255)    NOT NULL DEFAULT '',
+					languages         VARCHAR(255),
 					
 					PRIMARY KEY ( ID ) USING BTREE,
 					FOREIGN KEY ( userId ) REFERENCES users ( ID ) ON DELETE CASCADE
@@ -108,13 +108,13 @@ class UserInfoDatabase {
 		return new Promise((resolve, reject) => {
 			const keys = Object.keys(info)
 			.filter(key => modifiableKeys.includes(key as keyof DbUserInfo));
-			const set = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
+			const set = keys.map((key, i) => `${key} = ?`).join(', ');
 			const values = keys.map(key => info[key as keyof DbUserInfo]);
 			pool.query(`
 				UPDATE user_info
 				SET ${set}
 				WHERE ID = ?
-			`, [ID, ...values], (err) => {
+			`, [...values, ID], (err) => {
 				if (err) {
 					reject(err);
 				}
