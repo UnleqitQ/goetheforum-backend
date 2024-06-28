@@ -108,13 +108,13 @@ class UserInfoDatabase {
 		return new Promise((resolve, reject) => {
 			const keys = Object.keys(info)
 			.filter(key => modifiableKeys.includes(key as keyof DbUserInfo));
-			const set = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
+			const set = keys.map((key, i) => `${key} = ?`).join(', ');
 			const values = keys.map(key => info[key as keyof DbUserInfo]);
 			pool.query(`
 				UPDATE user_info
 				SET ${set}
 				WHERE ID = ?
-			`, [ID, ...values], (err) => {
+			`, [...values, ID], (err) => {
 				if (err) {
 					reject(err);
 				}
