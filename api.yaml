@@ -1820,28 +1820,41 @@ components:
         username:
           type: string
           description: Username may be null if the user is deleted.
+          nullable: true
         email:
           type: string
           format: email
           description: Email may be null if the user is deleted.
+          nullable: true
         role:
           $ref: '#/components/schemas/Role'
         displayName:
           type: string
+        avatar:
+          type: string
+          format: base64
+          nullable: true
         createdAt:
           type: string
           format: date-time
         deletedAt:
           type: string
           format: date-time
+          nullable: true
         bannedAt:
           type: string
           format: date-time
+          nullable: true
       required:
         - ID
         - role
         - displayName
         - createdAt
+        - email
+        - username
+        - bannedAt
+        - deletedAt
+        - avatar
     UserInfo:
       type: object
       description: A user info object.
