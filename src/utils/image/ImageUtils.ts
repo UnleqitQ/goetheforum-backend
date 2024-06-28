@@ -8,12 +8,16 @@ export interface ImageData {
 	format: string;
 }
 
-interface ImageCheck {
+export interface ImageCheck {
 	width?: number | {
 		min?: number;
 		max?: number;
 	};
 	height?: number | {
+		min?: number;
+		max?: number;
+	};
+	aspectRatio?: number | {
 		min?: number;
 		max?: number;
 	};
@@ -26,7 +30,7 @@ interface ImageCheck {
 
 class ImageUtils {
 	
-	public static checkImage(image: Buffer | string, options: ImageCheck): 'fileSize' | 'dimensions' | 'format' | 'invalid' | true {
+	public static checkImage(image: Buffer | string, options: ImageCheck): 'fileSize' | 'dimensions' | 'format' | 'aspectRatio' | 'invalid' | true {
 		const imageBuffer =
 			typeof image === 'string' ? Buffer.from(image, 'base64') : image;
 		
@@ -77,6 +81,24 @@ class ImageUtils {
 			}
 		}
 		
+		if (options.aspectRatio) {
+			const aspectRatio = data.dimensions.width / data.dimensions.height;
+			
+			if (typeof options.aspectRatio === 'number') {
+				if (Math.abs(aspectRatio - options.aspectRatio) > 1e-6) { // floating point comparison
+					return 'aspectRatio';
+				}
+			}
+			else {
+				if (options.aspectRatio.min && aspectRatio < options.aspectRatio.min) {
+					return 'aspectRatio';
+				}
+				if (options.aspectRatio.max && aspectRatio > options.aspectRatio.max) {
+					return 'aspectRatio';
+				}
+			}
+		}
+		
 		if (options.format) {
 			if (typeof options.format === 'string') {
 				if (data.format !== options.format) {
@@ -95,18 +117,23 @@ class ImageUtils {
 	
 	public static getImageData(image: Buffer | string): ImageData | null {
 		const imageBuffer = typeof image === 'string' ? Buffer.from(image, 'base64') : image;
-		const dimensions = imageSize(imageBuffer);
-		
-		if (!dimensions || !dimensions.width || !dimensions.height || !dimensions.type) {
+		try {
+			const dimensions = imageSize(imageBuffer);
+			
+			if (!dimensions || !dimensions.width || !dimensions.height || !dimensions.type) {
+				return null;
+			}
+			return {
+				dimensions: {
+					width: dimensions.width,
+					height: dimensions.height,
+				},
+				format: dimensions.type,
+			};
+		}
+		catch (e) {
 			return null;
 		}
-		return {
-			dimensions: {
-				width: dimensions.width,
-				height: dimensions.height,
-			},
-			format: dimensions.type,
-		};
 	}
 }
 

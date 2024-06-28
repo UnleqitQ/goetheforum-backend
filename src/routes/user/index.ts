@@ -3,10 +3,9 @@ import info from './info';
 import {UserData} from '../../types/user/UserData';
 import {ErrorResponse} from '../../types/ErrorResponse';
 import {matchedData, param, validationResult} from 'express-validator';
-import user from '../../utils/user/User';
 import User from '../../utils/user/User';
-import UserInfo from '../../utils/user/UserInfo';
 import display_name from './display_name';
+import avatar from './avatar';
 
 const router = Router();
 
@@ -43,5 +42,6 @@ const router = Router();
 
 router.use('/:user_id/info', info);
 router.use('/:user_id/display_name', display_name);
+router.use('/:user_id/avatar', avatar)
 
 export default router;
