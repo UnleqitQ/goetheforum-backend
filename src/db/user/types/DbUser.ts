@@ -25,6 +25,11 @@ export interface DbUser {
 	displayName: string;
 	
 	/**
+	 * An avatar image of the user (null if the user has no avatar)
+	 */
+	avatar: Buffer | null;
+	
+	/**
 	 * The date the user was created
 	 */
 	createdAt: Date;

@@ -18,6 +18,7 @@ class UserDatabase {
 					username    VARCHAR(255),
 					email       VARCHAR(255),
 					displayName VARCHAR(255) NOT NULL,
+					avatar      BLOB,
 					createdAt   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					deletedAt   TIMESTAMP,
 					bannedAt    TIMESTAMP,
@@ -151,6 +152,28 @@ class UserDatabase {
 				SET displayName = ?
 				WHERE ID = ?
 			`, [displayName, ID], (err) => {
+				if (err) {
+					reject(err);
+				}
+				else {
+					resolve();
+				}
+			});
+		});
+	}
+	
+	/**
+	 * Update a user's avatar
+	 * @param ID The ID of the user to update
+	 * @param avatar The new avatar
+	 */
+	static updateUserAvatar(ID: number, avatar: Buffer | null): Promise<void> {
+		return new Promise((resolve, reject) => {
+			pool.query(`
+				UPDATE users
+				SET avatar = ?
+				WHERE ID = ?
+			`, [avatar, ID], (err) => {
 				if (err) {
 					reject(err);
 				}

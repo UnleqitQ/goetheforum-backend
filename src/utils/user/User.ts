@@ -12,6 +12,7 @@ class User {
 	private _deletedAt: Date | null;
 	private _bannedAt: Date | null;
 	private _role: Role;
+	private _avatar: Buffer | null;
 	
 	private constructor(user: DbUser) {
 		this._ID = user.ID;
@@ -22,6 +23,7 @@ class User {
 		this._deletedAt = user.deletedAt;
 		this._bannedAt = user.bannedAt;
 		this._role = getRole(user.role);
+		this._avatar = user.avatar;
 	}
 	
 	public get ID(): number {
@@ -60,6 +62,14 @@ class User {
 		return getRoleID(this._role);
 	}
 	
+	public get avatar(): Buffer | null {
+		return this._avatar;
+	}
+	
+	public get avatarBase64(): string | null {
+		return this._avatar?.toString('base64') ?? null;
+	}
+	
 	public get data(): UserData {
 		return {
 			ID: this._ID,
@@ -70,6 +80,7 @@ class User {
 			deletedAt: this._deletedAt,
 			bannedAt: this._bannedAt,
 			role: this._role,
+			avatar: this.avatarBase64,
 		};
 	}
 	
@@ -90,6 +101,18 @@ class User {
 	public async setDisplayName(displayName: string): Promise<void> {
 		await UserDatabase.updateUserDisplayName(this._ID, displayName);
 		this._displayName = displayName;
+	}
+	
+	public async setAvatar(avatar: Buffer | string | null): Promise<void> {
+		if (avatar === null) {
+			await UserDatabase.updateUserAvatar(this._ID, null);
+			this._avatar = null;
+		}
+		else {
+			const buffer = typeof avatar === 'string' ? Buffer.from(avatar, 'base64') : avatar;
+			await UserDatabase.updateUserAvatar(this._ID, buffer);
+			this._avatar = buffer;
+		}
 	}
 	
 	public async ban(): Promise<void> {

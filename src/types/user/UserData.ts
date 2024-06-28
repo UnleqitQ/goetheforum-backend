@@ -25,6 +25,10 @@ export interface UserData {
 	 */
 	displayName: string;
 	/**
+	 * The avatar of the user (base64)
+	 */
+	avatar: string | null;
+	/**
 	 * The date the user was created
 	 */
 	createdAt: Date;
