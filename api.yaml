@@ -1794,6 +1794,116 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  # User avatar
+  /user/{user_id}/avatar:
+    get:
+      tags:
+        - User
+      summary: Get user avatar
+      description: Get the avatar of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    format: base64
+                    nullable: true
+                required:
+                  - value
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Update user avatar
+      description: Update the avatar of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  format: base64
+                  nullable: true
+              required:
+                - value
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User
+      security:
+        - AccessToken: [ ]
+      summary: Delete user avatar
+      description: Delete the avatar of a user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   # User
   /user/{user_id}:
     get:
@@ -1820,6 +1930,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+  #
 
 components:
   schemas:
