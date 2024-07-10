@@ -6,6 +6,7 @@ import {matchedData, param, validationResult} from 'express-validator';
 import User from '../../utils/user/User';
 import display_name from './display_name';
 import avatar from './avatar';
+import proof_of_work from './proof_of_work';
 
 const router = Router();
 
@@ -43,5 +44,6 @@ const router = Router();
 router.use('/:user_id/info', info);
 router.use('/:user_id/display_name', display_name);
 router.use('/:user_id/avatar', avatar)
+router.use('/:user_id/proof_of_work', proof_of_work);
 
 export default router;

@@ -1,6 +1,7 @@
 import {DbUser, UserDatabase} from '../../db/user';
 import {getRole, getRoleID, Role, RoleById, RoleId} from '../../types/Role';
 import {UserData} from '../../types/user/UserData';
+import * as powUtils from '../proof-of-work/pow-utils';
 
 class User {
 	
@@ -74,6 +75,16 @@ class User {
 	
 	public get proofOfWork(): string | null {
 		return this._proofOfWork;
+	}
+	
+	public get proofOfWorkDifficulty(): number {
+		return User.calculateProofOfWorkDifficulty(this._ID, this._proofOfWork);
+	}
+	
+	public static calculateProofOfWorkDifficulty(userID: number, proofOfWork: string | null): number {
+		if (!proofOfWork) return 0;
+		const data = `${userID}:${proofOfWork}`;
+		return powUtils.calculateDifficulty(data);
 	}
 	
 	public get data(): UserData {
