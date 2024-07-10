@@ -1,5 +1,5 @@
-import pool from "./db";
-import {DbUser} from "./types/DbUser";
+import pool from './db';
+import {DbUser} from './types/DbUser';
 
 /**
  * Class to interact with the user table in the database
@@ -23,6 +23,7 @@ class UserDatabase {
 					deletedAt   TIMESTAMP,
 					bannedAt    TIMESTAMP,
 					role        INT          NOT NULL,
+					proofOfWork VARCHAR(255),
 					
 					PRIMARY KEY ( ID ) USING BTREE,
 					UNIQUE KEY ( username ) USING BTREE,
@@ -124,7 +125,12 @@ class UserDatabase {
 	 * @param user The user information
 	 * @returns The ID of the user created
 	 */
-	static createUser(user: { username: string, email: string, displayName: string, role: number }): Promise<number> {
+	static createUser(user: {
+		username: string,
+		email: string,
+		displayName: string,
+		role: number
+	}): Promise<number> {
 		return new Promise((resolve, reject) => {
 			pool.query(`
 				INSERT INTO users (username, email, displayName, role)
@@ -184,6 +190,23 @@ class UserDatabase {
 		});
 	}
 	
+	static updateUserProofOfWork(ID: number, proofOfWork: string | null): Promise<void> {
+		return new Promise((resolve, reject) => {
+			pool.query(`
+				UPDATE users
+				SET proofOfWork = ?
+				WHERE ID = ?
+			`, [proofOfWork, ID], (err) => {
+				if (err) {
+					reject(err);
+				}
+				else {
+					resolve();
+				}
+			});
+		});
+	}
+	
 	/**
 	 * Delete a user (soft delete)
 	 * @param ID The ID of the user to delete
@@ -193,8 +216,8 @@ class UserDatabase {
 			pool.query(`
 				UPDATE users
 				SET deletedAt = CURRENT_TIMESTAMP,
-				    username = NULL, /* F*** legal requirements */
-				    email = NULL /* F*** legal requirements, again */
+						username  = NULL, /* F*** legal requirements */
+						email     = NULL /* F*** legal requirements, again */
 				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {
@@ -275,12 +298,14 @@ class UserDatabase {
 	 * Remove a user from the database (hard delete) (use with caution)
 	 */
 	static removeUser(ID: number): Promise<void> {
-		console.warn("Completely removing a user from the database (hard delete) is dangerous and should be used with caution");
-		console.log("Removing user with ID", ID, "from the database");
+		console.warn(
+			'Completely removing a user from the database (hard delete) is dangerous and should be used with caution');
+		console.log('Removing user with ID', ID, 'from the database');
 		
 		return new Promise((resolve, reject) => {
 			pool.query(`
-				DELETE FROM users
+				DELETE
+				FROM users
 				WHERE ID = ?
 			`, [ID], (err) => {
 				if (err) {

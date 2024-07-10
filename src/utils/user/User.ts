@@ -13,6 +13,7 @@ class User {
 	private _bannedAt: Date | null;
 	private _role: Role;
 	private _avatar: Buffer | null;
+	private _proofOfWork: string | null;
 	
 	private constructor(user: DbUser) {
 		this._ID = user.ID;
@@ -24,6 +25,7 @@ class User {
 		this._bannedAt = user.bannedAt;
 		this._role = getRole(user.role);
 		this._avatar = user.avatar;
+		this._proofOfWork = user.proofOfWork;
 	}
 	
 	public get ID(): number {
@@ -70,6 +72,10 @@ class User {
 		return this._avatar?.toString('base64') ?? null;
 	}
 	
+	public get proofOfWork(): string | null {
+		return this._proofOfWork;
+	}
+	
 	public get data(): UserData {
 		return {
 			ID: this._ID,
@@ -81,6 +87,7 @@ class User {
 			bannedAt: this._bannedAt,
 			role: this._role,
 			avatar: this.avatarBase64,
+			proofOfWork: this._proofOfWork,
 		};
 	}
 	
@@ -115,6 +122,11 @@ class User {
 		}
 	}
 	
+	public async setProofOfWork(proofOfWork: string | null): Promise<void> {
+		await UserDatabase.updateUserProofOfWork(this._ID, proofOfWork);
+		this._proofOfWork = proofOfWork;
+	}
+	
 	public async ban(): Promise<void> {
 		await UserDatabase.banUser(this._ID);
 		await this.refreshUser();
@@ -140,6 +152,8 @@ class User {
 		this._deletedAt = user.deletedAt;
 		this._bannedAt = user.bannedAt;
 		this._role = getRole(user.role);
+		this._avatar = user.avatar;
+		this._proofOfWork = user.proofOfWork;
 	}
 	
 	/**

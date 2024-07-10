@@ -40,4 +40,9 @@ export interface UserData {
 	 * The date the user was banned
 	 */
 	bannedAt: Date | null;
+	
+	/**
+	 * The proof of work associated with the user
+	 */
+	proofOfWork: string | null;
 }

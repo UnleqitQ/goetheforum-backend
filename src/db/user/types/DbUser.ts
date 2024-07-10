@@ -47,4 +47,9 @@ export interface DbUser {
 	 * The role id of the user
 	 */
 	role: number;
+	
+	/**
+	 * The proof of work associated with the user
+	 */
+	proofOfWork: string | null;
 }
