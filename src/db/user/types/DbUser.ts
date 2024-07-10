@@ -17,12 +17,17 @@ export interface DbUser {
 	/**
 	 * The email of the user (null if the user is deleted, because of the unique constraint on the email column, and the legal requirements for storing user data)
 	 */
-	email: string;
+	email: string | null;
 	
 	/**
 	 * The display name of the user
 	 */
 	displayName: string;
+	
+	/**
+	 * An avatar image of the user (null if the user has no avatar)
+	 */
+	avatar: Buffer | null;
 	
 	/**
 	 * The date the user was created
@@ -39,7 +44,7 @@ export interface DbUser {
 	bannedAt: Date | null;
 	
 	/**
-	 * The role id of the user (foreign key)
+	 * The role id of the user
 	 */
 	role: number;
 }

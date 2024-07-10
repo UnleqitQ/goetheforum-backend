@@ -12,17 +12,17 @@ const SETTINGS = {
 	access: {
 		secret: jwtenv.ACCESS_SECRET!,
 		expires: jwtenv.ACCESS_EXPIRATION!,
-		issuer: jwtenv.ISSUER!,
+		issuer: jwtenv.ACCESS_ISSUER!,
 	},
 	refresh: {
 		secret: jwtenv.REFRESH_SECRET!,
 		expires: jwtenv.REFRESH_EXPIRATION!,
-		issuer: jwtenv.ISSUER!,
+		issuer: jwtenv.REFRESH_ISSUER!,
 	},
 	login: {
 		secret: jwtenv.LOGIN_SECRET!,
 		expires: jwtenv.LOGIN_EXPIRATION!,
-		issuer: jwtenv.ISSUER!,
+		issuer: jwtenv.LOGIN_ISSUER!,
 	},
 }
 
@@ -39,10 +39,10 @@ class JwtUtils {
 		});
 	}
 	
-	static verify(token: string, type: 'access' | 'refresh' | 'login'): JwtBasicPayload {
+	static verify<T extends JwtBasicPayload = JwtBasicPayload>(token: string, type: 'access' | 'refresh' | 'login'): T {
 		return jwt.verify(token, SETTINGS[type].secret, {
 			issuer: SETTINGS[type].issuer,
-		}) as JwtBasicPayload;
+		}) as T;
 	}
 }
 

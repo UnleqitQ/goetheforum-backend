@@ -1,4 +1,23 @@
-export type VerificationType = 'password' | 'email' | 'totp' | 'backup_code';
+export const VerificationType = {
+	/**
+	 * The user verified using a password
+	 */
+	password: 'password',
+	/**
+	 * The user verified using an email
+	 */
+	email: 'email',
+	/**
+	 * The user verified using TOTP
+	 */
+	totp: 'totp',
+	/**
+	 * The user verified using a backup code
+	 */
+	backup_code: 'backup_code',
+} as const;
+
+export type VerificationType = typeof VerificationType[keyof typeof VerificationType];
 
 export const VerificationTypeRules: {
 	[key in VerificationType]: {

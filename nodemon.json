@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "watch": [
+	"api.yaml",
+	"./src"
+  ]
+}
